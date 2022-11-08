@@ -8,9 +8,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 const Stack = createNativeStackNavigator();
 
+
+//Views
 import Inicio from './views/Inicio'
 import NuevoCliente from './views/NuevoCliente'
 import DetalleCliente from './views/DetalleCliente'
+
+//Components
+import BarraSuperior from './components/ui/BarraSuperior';
 
 //Definir el tema
 const theme = {
@@ -30,12 +35,20 @@ const App = () => {
         screenOptions={{
           headerStyle: { backgroundColor: theme.colors.primary },
           headerTintColor: theme.colors.surface,
-          headerTitleStyle: { fontWeight: 'bold' }
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerTitleAlign: 'center'
       }}
       >
         <Stack.Screen
           name='Inicio'
           component={ Inicio }
+          options={ ({ navigation, route }) => ({
+            headerLeft: (props) => <BarraSuperior 
+                                      { ...props } 
+                                      navigation={ navigation }
+                                      route={ route }
+                                    />
+          })}
         />
         <Stack.Screen
           name='NuevoCliente'
