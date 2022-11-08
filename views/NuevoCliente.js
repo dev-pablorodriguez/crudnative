@@ -8,7 +8,9 @@ import {
   Dialog, 
   Portal
 } from 'react-native-paper'
+import axios from 'axios'
 import globalStyles from '../styles/global'
+import config from '../config'
 
 const NuevoCliente = () => {
   const [ nombre, setNombre ] = useState('');
@@ -18,7 +20,7 @@ const NuevoCliente = () => {
   const [ alerta, setAlerta ] = useState(false);
 
   //Almacenar cliente en la BD
-  const almacenarCliente = () => {
+  const almacenarCliente = async () => {
     //Validar datos
     if(!nombre || !telefono || !correo || !empresa){
       setAlerta(true);
@@ -27,9 +29,14 @@ const NuevoCliente = () => {
 
     //Crear cliente
     const cliente = { nombre, telefono, correo, empresa}
-    console.log(cliente)
 
     //Post cliente hacia la API
+    try {
+      const url = `${ config.apiUrl }/clientes`;
+      await axios.post(url, cliente);
+    } catch (error) {
+      console.log(error)
+    }
 
     //Redireccionar
 
