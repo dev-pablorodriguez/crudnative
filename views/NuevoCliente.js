@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { 
   TextInput, 
@@ -12,12 +12,26 @@ import axios from 'axios'
 import globalStyles from '../styles/global'
 import config from '../config'
 
-const NuevoCliente = () => {
+const NuevoCliente = ({ navigation, route }) => {
   const [ nombre, setNombre ] = useState('');
   const [ telefono, setTelefono ] = useState('');
   const [ correo, setCorreo ] = useState('');
   const [ empresa, setEmpresa ] = useState('');
   const [ alerta, setAlerta ] = useState(false);
+
+  useEffect( () => {
+    if(isUpdatingRecord){
+      const { nombre, telefono, correo, empresa } = route.params.cliente;
+
+      setNombre(nombre);
+      setTelefono(telefono);
+      setCorreo(correo);
+      setEmpresa(empresa);
+    }
+  }, [])
+
+  const { setConsultarApi } = route.params;
+  const isUpdatingRecord = !!route.params.cliente;
 
   //Almacenar cliente en la BD
   const almacenarCliente = async () => {
@@ -30,22 +44,40 @@ const NuevoCliente = () => {
     //Crear cliente
     const cliente = { nombre, telefono, correo, empresa}
 
-    //Post cliente hacia la API
-    try {
-      const url = `${ config.apiUrl }/clientes`;
-      await axios.post(url, cliente);
-    } catch (error) {
-      console.log(error)
+    //Revisar si es edición o creación
+    if(isUpdatingRecord){
+      //Update cliente hacia la API
+      try {
+        const url = `${ config.apiUrl }/clientes/${ route.params.cliente.id }`;
+        await axios.put(url, cliente);
+      } catch (error) {
+        console.log(error)
+      }
+    }else{
+      //Post cliente hacia la API
+      try {
+        const url = `${ config.apiUrl }/clientes`;
+        await axios.post(url, cliente);
+      } catch (error) {
+        console.log(error)
+      }
     }
 
-    //Redireccionar
-
     //Limpiar form
+    //El component NuevoCliente se desmonta al navegar a otra screen y se limpia
+
+    //Actualizar el estado de setConsultarApi para que realice la consulta a la BD
+    setConsultarApi(true);
+
+    //Redireccionar
+    navigation.navigate('Inicio')
   }
 
   return (
     <View style={ globalStyles.contenedor }>
-      <Headline style={ globalStyles.titulo }>Añadir Nuevo Cliente</Headline>
+      <Headline style={ globalStyles.titulo }>
+        { isUpdatingRecord ? 'Editar Cliente' : 'Añadir Nuevo Cliente' }
+      </Headline>
 
       <TextInput
         label='Nombre'
@@ -88,7 +120,7 @@ const NuevoCliente = () => {
         uppercase
         onPress={ almacenarCliente }
       >
-        Agregar Cliente
+        { isUpdatingRecord ? 'Editar Cliente' : 'Agregar Cliente' }
       </Button>
 
 
