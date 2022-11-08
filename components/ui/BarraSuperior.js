@@ -6,13 +6,16 @@ const BarraSuperior = ({ navigation }) => {
   }
 
   return (
-    <Button
-      icon=''
-      textColor='#FFF' 
-      onPress={ handlePress }
-    >
-      Nuevo Cliente
-    </Button>
+    <>
+      <Button
+      icon='plus'
+        textColor='#FFF' 
+        onPress={ handlePress }
+        uppercase
+      >
+        Cliente
+      </Button>
+    </>
   )
 }
 
